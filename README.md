@@ -1,5 +1,4 @@
 # ImmunoLandscape-TCGA-LUAD
-Tumor microenvironment deconvolution using RNA-seq data from TCGA-LUAD.
 ## ImmunoLandscape: TCGA-LUAD Immune Microenvironment Pipeline
 
 This project analyzes the immune microenvironment of lung adenocarcinoma (LUAD) using transcriptional profiling and immune deconvolution.
