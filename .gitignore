@@ -172,3 +172,17 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+# Don’t track raw downloads or cache
+GDCdata/
+data/raw/
+
+# Don’t track large R data objects or manifests
+MANIFEST.txt
+df.rds
+results.rds
+
+# RStudio / temp files
+.Rhistory
+.RData
+.Rproj.user/
+
