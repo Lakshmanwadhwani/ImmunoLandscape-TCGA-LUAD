@@ -14,7 +14,8 @@ dir.create("figures", showWarnings = FALSE)
 # Load CIBERSORTx results
 # IMPORTANT: make sure this path matches where your CIBERSORTx_Results.csv is saved
 
-ciber_results <- read.csv("data/processed/Immunedeconv_CIBERSORT_ABS.csv", check.names = FALSE)
+ciber_results <- read.csv("data/processed/Immunedeconv_EPIC.csv", check.names = FALSE)
+
 
 # Clean: remove metrics columns (keep only immune fractions)
 # If your CIBERSORTx file contains these columns, they will be removed:vg
