@@ -1,50 +1,65 @@
 # process_cibersortx_output.R
 # Author: [Your Name]
 # Project: ImmunoLandscape-TCGA-LUAD
-# Purpose: Process CIBERSORTx output and generate immune landscape plots
+# Purpose: Process EPIC deconvolution results and generate immune landscape plot
 
+# -------------------------------------
 # Load required packages
-library(tidyverse)
-library(reshape2)
-library(ggplot2)
+# -------------------------------------
+library(tidyverse)  # includes dplyr, tidyr, ggplot2, etc.
 
-# Create figures directory if not exists
+# -------------------------------------
+# Create figures directory if it doesn't exist
+# -------------------------------------
 dir.create("figures", showWarnings = FALSE)
 
-# Load CIBERSORTx results
-# IMPORTANT: make sure this path matches where your CIBERSORTx_Results.csv is saved
+# -------------------------------------
+# Load EPIC immunedeconv results (wide format)
+# -------------------------------------
+epic_raw <- read.csv(
+  "data/processed/Immunedeconv_EPIC.csv",
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
 
-ciber_results <- read.csv("data/processed/Immunedeconv_EPIC.csv", check.names = FALSE)
+# -------------------------------------
+# Pivot from wide → long format
+# -------------------------------------
+immune_long <- epic_raw %>%
+  pivot_longer(
+    cols      = -cell_type,
+    names_to  = "SampleID",
+    values_to = "Fraction"
+  ) %>%
+  rename(CellType = cell_type)
 
-
-# Clean: remove metrics columns (keep only immune fractions)
-# If your CIBERSORTx file contains these columns, they will be removed:vg
-#   P-value, Correlation, RMSE
-# If your file does not have them → this line will still work safely
-immune_cols <- ciber_results %>% select(-matches("P.value|Correlation|RMSE"))
-
-# OPTIONAL: rename first column to "SampleID" if needed
-colnames(immune_cols)[1] <- "SampleID"
-
-# Reshape to long format for plotting
-immune_long <- melt(immune_cols, id.vars = "SampleID",
-                    variable.name = "CellType",
-                    value.name = "Fraction")
-
-# Plot: Stacked barplot of immune landscape per tumor
+# -------------------------------------
+# Plot: stacked barplot of immune fractions per tumor
+# -------------------------------------
 p <- ggplot(immune_long, aes(x = SampleID, y = Fraction, fill = CellType)) +
   geom_bar(stat = "identity") +
   theme_bw() +
-  labs(title = "Immune Landscape of TCGA-LUAD (CIBERSORTx)",
-       x = "Sample",
-       y = "Estimated Fraction",
-       fill = "Immune Cell Type") +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        legend.position = "right")
+  labs(
+    title    = "Immune Landscape of TCGA-LUAD (EPIC Deconvolution)",
+    x        = "Sample",
+    y        = "Estimated Fraction",
+    fill     = "Cell Type"
+  ) +
+  theme(
+    axis.text.x  = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = "right"
+  )
 
+# -------------------------------------
 # Save the plot
-ggsave("figures/TCGA_LUAD_ImmuneLandscape_Barplot.png", p,
-       width = 12, height = 6)
+# -------------------------------------
+ggsave(
+  filename = "figures/TCGA_LUAD_ImmuneLandscape_Barplot.png",
+  plot     = p,
+  width    = 12,
+  height   = 6
+)
 
 cat("✅ Immune landscape plot saved: figures/TCGA_LUAD_ImmuneLandscape_Barplot.png\n")
+
